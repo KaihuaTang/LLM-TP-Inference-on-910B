@@ -1,4 +1,5 @@
 import torch
+# check whether NPU (910B) is available
 try:
     import torch_npu
     USE_NPU = True
@@ -15,8 +16,6 @@ from torch.multiprocessing import Process
 
 import models
 from utils import load_mp_model_tokenizer, get_hcomm_info
-
-# check whether NPU (910B) is available
 
 def run_multi_npu(args, rank, port, user_input):
     # init dist
