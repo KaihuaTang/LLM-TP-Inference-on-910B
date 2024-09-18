@@ -15,10 +15,14 @@
 
 # 运行脚本
 ```
+# RUN llama-2-7b-hf
 python main.py --model_type llama2 --model_path /home/ma-user/work/t00831955/checkpoints/llama-2-7b-hf --world_size 8 --use_mc2
+
+# RUN Qwen-7B-Chat
+python main.py --model_type qwen --model_path /home/ma-user/work/t00831955/checkpoints/Qwen-7B-Chat --world_size 8 --use_mc2
 ```
 参数解释：
-- model_type输入llama2 / Qwen。注意，之所以需要指定模型名，是因为本项目的手搓TP并行需要修改模型代码，因此不同模型需要加载不同代码。但修改并不复杂，后续会解释。
+- model_type输入llama2 / qwen。注意，之所以需要指定模型名，是因为本项目的手搓TP并行需要修改模型代码，因此不同模型需要加载不同代码。但修改并不复杂，后续会解释。
 - model_path为通过huggingface下载的模型ckpt路径。
 - world_size为开启TP多卡并行后，本地所使用的卡数，卡数越多单卡所需的计算越小。
 - use_mc2为910B最新版本的加速功能，如果你的版本不支持关掉即可。其原理是在TP时，多卡的Linear计算和all_reduce通信实现通信并行。详细来说就是把Linear的计算切成多个小块，每一块计算时上一块的计算结果同时进行all_reduce通信，通过计算和通信流水降低整体耗时。
