@@ -2,7 +2,10 @@
 import math
 from typing import List, Optional, Tuple, Union
 import torch
-import torch_npu
+try:
+    import torch_npu
+except:
+    print('NPU is not detected')
 from torch import nn
 import torch.nn.functional as F
 from abc import ABC, abstractmethod
