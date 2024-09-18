@@ -13,6 +13,10 @@
 2. 之后需要安装pytorch与torch_npu，注意torch与torch_npu需要版本一致，请参考如下的链接安装。[(链接)](https://github.com/Ascend/pytorch)
 3. 与NPU相关的依赖库只有上面两条，之后正常通过pip安装transformers和其他依赖库即可。
 
+# 下载ckpt
+1. 本项目使用的LLaMA2链接为：[https://huggingface.co/meta-llama/Llama-2-7b-hf](https://huggingface.co/meta-llama/Llama-2-7b-hf)
+2. 本项目使用的Qwen链接为：[https://huggingface.co/Qwen/Qwen-7B-Chat](https://huggingface.co/Qwen/Qwen-7B-Chat)
+   
 # 运行脚本
 ```
 # RUN llama-2-7b-hf
