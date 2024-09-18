@@ -43,11 +43,15 @@ def run_multi_npu(args, rank, port, user_input):
     model = model.bfloat16().npu(rank)
     model = model.eval()
     
-    input_ids = tokenizer.encode(user_input, return_tensors="pt")
-    input_ids = input_ids.npu()
-    output = model.generate(input_ids, max_length=256)
-    if rank == 0:
+    if args.model_type == 'llama2':
+        input_ids = tokenizer.encode(user_input, return_tensors="pt")
+        input_ids = input_ids.npu()
+        output = model.generate(input_ids, max_length=256)
         response = tokenizer.decode(output[0], skip_special_tokens=True)
+    elif args.model_type == 'qwen':
+        response, _ = model.chat(tokenizer, user_input, history=None)
+        
+    if rank == 0:
         print("=====================================================================")
         print(f"Response: {response}")
         return response
@@ -81,11 +85,15 @@ def run_multi_gpu(args, rank, port, user_input):
     model = model.bfloat16().cuda(rank)
     model = model.eval()
     
-    input_ids = tokenizer.encode(user_input, return_tensors="pt")
-    input_ids = input_ids.cuda(rank)
-    output = model.generate(input_ids, max_length=256)
-    if rank == 0:
+    if args.model_type == 'llama2':
+        input_ids = tokenizer.encode(user_input, return_tensors="pt")
+        input_ids = input_ids.cuda(rank)
+        output = model.generate(input_ids, max_length=256)
         response = tokenizer.decode(output[0], skip_special_tokens=True)
+    elif args.model_type == 'qwen':
+        response, _ = model.chat(tokenizer, user_input, history=None)
+        
+    if rank == 0:
         print("=====================================================================")
         print(f"Response: {response}")
         return response
