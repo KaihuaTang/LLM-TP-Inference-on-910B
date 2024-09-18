@@ -8,6 +8,9 @@
 - 学会使用910B推理开源huggingface的LLM模型(提供LLaMA2与Qwen样例)。
 - 学会使用910B进行多卡TP并行推理LLM模型(提供LLaMA2与Qwen样例)。
 
+**如果我的开源项目给您带来了启发，提供一些赞助将对我后续的开源工作有很大的帮助。** 
+[支持我的后续开源工作❤️🙏](https://kaihuatang.github.io/donate.html) [(往期支持者)](https://kaihuatang.github.io/supporters.html)
+
 # 安装依赖库
 1. 首先需要安装最新的CANN包，类比于CUDA。[(链接)](https://www.hiascend.com/en/software/cann/community)
 2. 之后需要安装pytorch与torch_npu，注意torch与torch_npu需要版本一致，请参考如下的链接安装。[(链接)](https://github.com/Ascend/pytorch)
