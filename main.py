@@ -61,11 +61,14 @@ def run_multi_npu(args, rank, port, user_input):
 
 def run_multi_gpu(args, rank, port, user_input):
     # init dist
+    torch.cuda.set_device(rank)
     print("current device:", torch.cuda.current_device())
     os.environ['MASTER_ADDR'] = '127.0.0.1'
     os.environ['MASTER_PORT'] = str(port)
     dist.init_process_group(backend="nccl", rank=rank, world_size=int(args.world_size))
     print(f"device_{rank} init_process_group success")
+
+    dist.barrier()
 
     # load model
     if rank == 0:
@@ -80,10 +83,12 @@ def run_multi_gpu(args, rank, port, user_input):
             m.set_dist_info(args.world_size, dist, rank, False)
             m.turn_global_weights_to_local()
             if rank == 0:
-                print(f"==> Split weights of layer {name} to each device (model parallel). [MC2 Switch: {args.use_mc2}]")
+                print(f"==> Split weights of layer {name} to each device (model parallel). [MC2 Switch: {False}]")
             
     model = model.bfloat16().cuda(rank)
     model = model.eval()
+    
+    dist.barrier()
     
     if args.model_type == 'llama2':
         input_ids = tokenizer.encode(user_input, return_tensors="pt")
@@ -92,6 +97,8 @@ def run_multi_gpu(args, rank, port, user_input):
         response = tokenizer.decode(output[0], skip_special_tokens=True)
     elif args.model_type == 'qwen':
         response, _ = model.chat(tokenizer, user_input, history=None)
+        
+    dist.barrier()
         
     if rank == 0:
         print("=====================================================================")
