@@ -51,8 +51,8 @@ def load_mp_model_tokenizer(model_type, model_path):
         return model, tokenizer
     elif model_type == 'qwen':
         from transformers import AutoTokenizer 
-        model = models.QwenForCausalLM_MP.from_pretrained(model_path)
-        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        model = models.QwenForCausalLM_MP.from_pretrained(model_path, trust_remote_code=True)
+        tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
         return model, tokenizer
     else:
         raise ValueError('No Valid Model')
