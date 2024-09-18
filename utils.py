@@ -49,9 +49,10 @@ def load_mp_model_tokenizer(model_type, model_path):
         model = models.LlamaForCausalLM_MP.from_pretrained(model_path)
         tokenizer = models.LlamaTokenizer.from_pretrained(model_path)
         return model, tokenizer
-    elif model_type == 'Qwen':
+    elif model_type == 'qwen':
+        from transformers import AutoTokenizer 
         model = models.QwenForCausalLM_MP.from_pretrained(model_path)
-        tokenizer = models.QWenTokenizer.from_pretrained(model_path)
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
         return model, tokenizer
     else:
         raise ValueError('No Valid Model')
