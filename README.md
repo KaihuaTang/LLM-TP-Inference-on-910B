@@ -27,5 +27,4 @@ python main.py --model_type llama2 --model_path /home/ma-user/work/t00831955/che
 
 TODO
 - 添加Qwen支持
-- 添加GPU支持
 - 完善README
