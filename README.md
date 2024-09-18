@@ -34,5 +34,4 @@ python main.py --model_type qwen --model_path /home/ma-user/work/t00831955/check
 # TP并行原理
 
 TODO
-- 添加Qwen支持
 - 完善README
