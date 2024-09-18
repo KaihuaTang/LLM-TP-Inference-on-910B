@@ -73,7 +73,7 @@ def run_multi_gpu(args, rank, port, user_input):
         print(f"Apply Tensor Parallel: start spliting weights to each device")
     for name, m in model.named_modules():
         if isinstance(m, models.BaseParallelLayer):
-            m.set_dist_info(args.world_size, dist, rank, args.use_mc2, hcomm_info)
+            m.set_dist_info(args.world_size, dist, rank, False)
             m.turn_global_weights_to_local()
             if rank == 0:
                 print(f"==> Split weights of layer {name} to each device (model parallel). [MC2 Switch: {args.use_mc2}]")
