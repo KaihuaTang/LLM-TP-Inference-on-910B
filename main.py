@@ -13,6 +13,7 @@ import random
 from datetime import datetime
 import torch.multiprocessing as mp
 from torch.multiprocessing import Process
+import torch.distributed as dist
 
 import models
 from utils import load_mp_model_tokenizer, get_hcomm_info
@@ -53,6 +54,45 @@ def run_multi_npu(args, rank, port, user_input):
     else:
         return None
 
+
+def run_multi_gpu(args, rank, port, user_input):
+    # init dist
+    print("current device:", torch.cuda.current_device())
+    os.environ['MASTER_ADDR'] = '127.0.0.1'
+    os.environ['MASTER_PORT'] = str(port)
+    dist.init_process_group(backend="nccl", rank=rank, world_size=int(args.world_size))
+    print(f"device_{rank} init_process_group success")
+
+    # load model
+    if rank == 0:
+        print(f"Load {args.model_type} from {args.model_path}")
+    model, tokenizer = load_mp_model_tokenizer(args.model_type, args.model_path)
+    
+    # initialize tensor parallel
+    if rank == 0:
+        print(f"Apply Tensor Parallel: start spliting weights to each device")
+    for name, m in model.named_modules():
+        if isinstance(m, models.BaseParallelLayer):
+            m.set_dist_info(args.world_size, dist, rank, args.use_mc2, hcomm_info)
+            m.turn_global_weights_to_local()
+            if rank == 0:
+                print(f"==> Split weights of layer {name} to each device (model parallel). [MC2 Switch: {args.use_mc2}]")
+            
+    model = model.bfloat16().cuda(rank)
+    model = model.eval()
+    
+    input_ids = tokenizer.encode(user_input, return_tensors="pt")
+    input_ids = input_ids.cuda(rank)
+    output = model.generate(input_ids, max_length=256)
+    if rank == 0:
+        response = tokenizer.decode(output[0], skip_special_tokens=True)
+        print("=====================================================================")
+        print(f"Response: {response}")
+        return response
+    else:
+        return None
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_type', type=str, default='')
@@ -66,8 +106,7 @@ def main():
         target_func = run_multi_npu
     elif torch.cuda.is_available():
         print("Detect GPU environment")
-        #target_func = run_multi_gpu
-        raise ValueError("GPU environment is not supported yet!")
+        target_func = run_multi_gpu
     else:
         raise ValueError("Neither NPU nor GPU environment is given!")
     
