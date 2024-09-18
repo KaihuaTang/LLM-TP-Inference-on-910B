@@ -94,7 +94,7 @@ def _prepare_4d_causal_attention_mask_with_cache_position(
     else:
         causal_mask = torch.full((sequence_length, target_length), fill_value=min_dtype, dtype=dtype, device=device)
         if sequence_length != 1:
-            causal_mask = torch.triu(causal_mask, diagonal=1)
+            causal_mask = torch.triu(causal_mask.float(), diagonal=1).to(dtype=dtype)
         causal_mask *= torch.arange(target_length, device=device) > cache_position.reshape(-1, 1)
         causal_mask = causal_mask[None, None, :, :].expand(batch_size, 1, -1, -1)
         if attention_mask is not None:
